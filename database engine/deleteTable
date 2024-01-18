@@ -1,0 +1,92 @@
+
+#!/bin/bash
+
+shopt -s extglob
+export LC_COLLATE=C
+
+
+while true
+do 
+    read -p "Enter the table name you want to select from " tablename
+if [ ! -e $tablename ]
+then
+echo "please enter a valid name" 
+else
+col_arr=$(awk -F ':' 'NR == 1 {gsub(/:$/, "", $0); print $0}' "${tablename}_metadata")
+numofcol=$(awk -F ':' 'END {print NF}' "${tablename}_metadata")
+
+break
+fi
+done
+
+
+select opt in "Delete All" "Delete Specific row" "Exit"
+do
+case $REPLY in 
+1)
+alllines=`cat $tablename | wc -l `
+
+if (( $alllines > 0 ))
+then
+cat /dev/null > $tablename
+echo "All Data deleted successfully.."
+
+else
+echo "No Data found.."
+
+. ~/project/mainOptions		
+
+fi		
+;;
+
+2)
+echo "All columns"
+echo "-------------"
+echo "$col_arr" | tr ':' '\n' | awk '{print NR"-"$0; print "-------------"}'
+
+while true
+do
+read -p "please enter number of col you want to delete by:" colnum
+if [[ $colnum =~ ^[0-9]+$ && $numofcol -gt $colnum ]]
+then
+read -p "please enter value of col you want to delete by= " valueofcol
+linebeforedelete=`cat $tablename | wc -l `
+
+awk -v col="$colnum" -v value="$valueofcol" -F ':' '{
+if($col !=  value)
+print $0
+}' $tablename > /tmp/tmpdata 
+
+
+mv   /tmp/tmpdata $tablename
+lineafterdelete=`cat $tablename | wc -l `
+
+if (( $lineafterdelete != $linebeforedelete ))
+then
+echo "$(( linebeforedelete - lineafterdelete )) row deleted successfully.."
+else
+echo "No data deleted .."
+fi        
+
+. ~/project/mainOptions		
+
+break
+else 
+echo "column not found please enter a valid number!"
+continue
+fi
+done
+		
+;;
+
+3)
+
+. ~/project/mainOptions		
+;;
+
+
+
+esac
+done
+
+. ~/project/mainOptions

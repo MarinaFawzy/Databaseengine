@@ -1,0 +1,76 @@
+#!/bin/bash
+
+shopt -s extglob
+
+
+main_options_arr=("Create Table" "List Table" "Update Table" "Drop Table" "insert into Table" "Select Data"  "Delete Data" "Exit" "Return")
+
+while true
+do
+    echo "Choose from the main options:"
+
+    select option in "${main_options_arr[@]}"
+    do 
+       case $REPLY in
+    1) 
+        echo "Creating Table"
+        . ~/project/createTable 
+        break
+        ;;
+    2)  
+        echo "Listing Table"
+        . ~/project/listTable
+        break
+        ;;
+    3)  
+        echo "Updating Table"
+        . ~/project/updateTable 
+        break
+        ;;
+    4)  
+        echo "Dropping Table"
+        . ~/project/dropTable 
+        break
+        ;;
+    5) 
+        echo "Inserting into Table"
+        . ~/project/insertTable 
+        break
+        ;;
+    6)
+        echo "Selecting Data from Table"
+        . ~/project/selectTable 
+        break
+        ;;
+   
+    7)
+        echo "Deleting Data from Table"
+        . ~/project/deleteTable
+        break
+        ;;
+    8)
+        echo "Exiting"
+        exit 
+        ;;
+    9)
+        echo "Returning to main list"
+        . ~/project/mainEntry 
+        break
+        ;;
+    *)
+        echo "Invalid option"
+        ;;
+esac
+
+
+        read -n 1 -p "Press Enter to return to main options or press 'q' to quit: " choice
+        choice=${choice,,}
+
+        if [ "$choice" == "q" ]; then
+            echo "Exiting"
+            exit
+        fi
+		. ~/project/mainOptions
+    done
+done
+
